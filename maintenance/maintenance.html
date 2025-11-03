@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MkpọŋNLP - Under Construction</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Inter', sans-serif;
+  background: linear-gradient(135deg,#f9f9f9 0%,#e0f2f1 100%);
+  min-height:100vh; display:flex; justify-content:center; align-items:center; overflow-x:hidden;
+}
+.maintenance-container { text-align:center; max-width:800px; padding:2rem; position:relative; }
+.logo-container { margin-bottom:2rem; }
+.mkpopnlp-logo { display:inline-block; text-align:center; }
+.mkpopnlp-logo-svg { width:100%; max-width:320px; height:auto; display:block; margin:0 auto; }
+.mkpopnlp-logo-path { stroke-dasharray:400; stroke-dashoffset:400; animation:draw 1.8s ease-in-out forwards; }
+@keyframes draw { to { stroke-dashoffset:0; } }
+.message-container {
+  background:white; border-radius:24px; padding:2.5rem;
+  box-shadow:0 12px 24px rgba(0,0,0,0.08); border:1px solid rgba(0,0,0,0.05);
+  margin-bottom:2rem; position:relative; z-index:10;
+}
+h1 { font-size:2.5rem; font-weight:700; color:#2e2e2e; margin-bottom:1rem; }
+p { font-size:1.2rem; color:#555; margin-bottom:1.5rem; line-height:1.6; }
+.highlight { color:#FF7043; font-weight:600; }
+.construction-icons { display:flex; justify-content:center; margin:2rem 0; }
+.switching-icon { font-size:2.5rem; animation:iconPop 0.3s ease-out; }
+@keyframes iconPop { 0%{transform:scale(0.8);opacity:0.5;}50%{transform:scale(1.2);}100%{transform:scale(1);opacity:1;} }
+.construction-area { position:relative; width:100%; height:220px; margin-top:2rem; }
+.crane-container { position:absolute; top:0; left:0; width:100%; height:160px; z-index:2; pointer-events:none; }
+.crane-beam { position:absolute; top:0; left:0; width:100%; height:8px; background:#555; border-radius:4px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+.floor-beam { position:absolute; bottom:0; left:0; width:100%; height:6px; background:#666; border-radius:3px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+.hook { position:absolute; top:8px; width:32px; height:40px; pointer-events:none; z-index:3; transform-origin:top center; }
+.hook-body { position:absolute; left:50%; top:0; width:4px; height:0; background:#FF7043; border-radius:2px; transform-origin:top center; margin-left:-2px; }
+.hook-tip { position:absolute; left:50%; top:0; width:12px; height:12px; margin-left:-6px; border-bottom:4px solid #FF7043; border-left:4px solid #FF7043; border-radius:0 0 0 8px; background:transparent; }
+.hook-1 { left:20%; }
+.hook-2 { left:45%; }
+.hook-3 { left:70%; }
+.block-pile { position:absolute; left:0; bottom:6px; width:100%; height:100px; z-index:1; }
+.pile-block { width:32px; height:16px; position:absolute; background:linear-gradient(to bottom,#FF7043,#f4511e); border-radius:3px; box-shadow:0 2px 4px rgba(0,0,0,0.2); transition:all 1s ease-in-out; }
+.social-links { display:flex; justify-content:center; gap:1rem; margin-top:2rem; }
+.social-link { display:inline-block; padding:0.5rem 1rem; background:#f0f0f0; border-radius:50px; color:#555; text-decoration:none; transition:all 0.3s ease; }
+.social-link:hover { background:#66BB6A; color:white; }
+.social-link.disabled { opacity:0.6; cursor:default; }
+.social-link.disabled:hover { background:#f0f0f0; color:#555; }
+@media (max-width:768px) { h1{font-size:2rem;} p{font-size:1rem;} }
+</style>
+</head>
+<body>
+<div class="maintenance-container">
+  <div class="logo-container">
+    <div class="mkpopnlp-logo" style="max-width:400px;">
+      <svg class="mkpopnlp-logo-svg" viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="gradient-navbar" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#66BB6A"/>
+            <stop offset="60%" stop-color="#81C784"/>
+            <stop offset="100%" stop-color="#FF7043"/>
+          </linearGradient>
+        </defs>
+        <path d="M 40 30 L 40 110 L 250 110" 
+              stroke="url(#gradient-navbar)" 
+              stroke-width="7" 
+              stroke-linecap="round" 
+              stroke-linejoin="round"
+              class="mkpopnlp-logo-path"
+              fill="none"/>
+        <text x="160" y="75" font-family="Inter, sans-serif" font-size="36" font-weight="700" fill="#000000" text-anchor="middle">
+          MkpọŋNLP
+        </text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="message-container">
+    <h1>We're Building Something Amazing!</h1>
+    <p>Our team is hard at work creating an incredible experience for you.</p>
+    <p>We're adding new features, improving performance, and making everything even better than before.</p>
+    <div class="construction-icons"><div class="switching-icon">🔨</div></div>
+    <p>Estimated completion: <span class="highlight">Soon!</span></p>
+    <div class="social-links">
+      <a href="#" class="social-link disabled">Coming Soon</a>
+      <a href="#" class="social-link disabled">Coming Soon</a>
+      <a href="#" class="social-link disabled">Coming Soon</a>
+      <a href="mailto:ndianaobot8@gmail.com" class="social-link">Email Us</a>
+    </div>
+  </div>
+
+  <div class="construction-area">
+    <div class="crane-container">
+      <div class="crane-beam"></div>
+      <div class="hook hook-1"><div class="hook-body"></div><div class="hook-tip"></div></div>
+      <div class="hook hook-2"><div class="hook-body"></div><div class="hook-tip"></div></div>
+      <div class="hook hook-3"><div class="hook-body"></div><div class="hook-tip"></div></div>
+      <div class="block-pile"></div>
+      <div class="floor-beam"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Construction icon animation
+(function() {
+  const icons = ['🔨','🚧','🛠️','📐','⚡'];
+  let currentIcon = 0;
+  const iconElement = document.querySelector('.switching-icon');
+  function switchIcon() {
+    currentIcon = (currentIcon + 1) % icons.length;
+    iconElement.style.animation = 'none';
+    iconElement.offsetHeight;
+    iconElement.style.animation = null;
+    iconElement.textContent = icons[currentIcon];
+  }
+  setInterval(switchIcon,1000);
+})();
+
+// Crane block pickup
+(function() {
+  const hooks = [
+    document.querySelector('.hook-1'),
+    document.querySelector('.hook-2'),
+    document.querySelector('.hook-3')
+  ];
+  const pile = document.querySelector('.block-pile');
+  const minBlocks = 8, maxBlocks = 15, maxStackHeight = 3, blockWidth = 40;
+
+  function getRandomInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+  function createBlock(x,y){
+    const block = document.createElement('div');
+    block.className='pile-block';
+    block.style.left = x+'px';
+    block.style.bottom = y+'px';
+    block.style.opacity='0';
+    pile.appendChild(block);
+    block.offsetHeight;
+    block.style.opacity='1';
+    return block;
+  }
+
+  function createPileBlocks(){
+    pile.innerHTML='';
+    const numBlocks = getRandomInt(minBlocks,maxBlocks);
+    const totalWidth = numBlocks*blockWidth;
+    const startX = (pile.offsetWidth-totalWidth)/2;
+    const stacks = Array(numBlocks).fill(0);
+
+    for(let i=0;i<numBlocks;i++){ createBlock(startX+i*blockWidth,0); stacks[i]=1; }
+    for(let i=0;i<numBlocks;i++){
+      const stackHeight = getRandomInt(0,maxStackHeight-1);
+      for(let j=0;j<stackHeight;j++){ createBlock(startX+i*blockWidth, stacks[i]*16); stacks[i]++; }
+    }
+  }
+
+  function getTopBlocks(){
+    const blocks=[...pile.querySelectorAll('.pile-block')];
+    const stacks={};
+    blocks.forEach(b=>{
+      const x=b.style.left;
+      const y=parseInt(b.style.bottom);
+      if(!stacks[x] || y>stacks[x].bottom) stacks[x]={el:b,bottom:y};
+    });
+    return Object.values(stacks).map(s=>s.el);
+  }
+
+  async function pickUpBlock(hook, block){
+    const hookRect=hook.getBoundingClientRect();
+    const blockRect=block.getBoundingClientRect();
+    const pileRect=pile.getBoundingClientRect();
+    const targetX=blockRect.left + blockRect.width/2 - hook.offsetWidth/2;
+    const leftPercent=((targetX-pileRect.left)/pileRect.width)*100;
+    const distanceToBlock=(blockRect.top+blockRect.height)-hookRect.top;
+
+    const rope=hook.querySelector('.hook-body');
+    const tip=hook.querySelector('.hook-tip');
+
+    // Move horizontally
+    hook.style.transition='left 1.2s ease-in-out';
+    hook.style.left=leftPercent+'%';
+    await new Promise(r=>setTimeout(r,1200));
+
+    // Extend rope
+    rope.style.transition='height 0.8s ease-in-out';
+    rope.style.height=distanceToBlock+'px';
+    tip.style.transition='top 0.8s ease-in-out';
+    tip.style.top=distanceToBlock+'px';
+    await new Promise(r=>setTimeout(r,800));
+
+    // Lift block and retract rope simultaneously
+    rope.style.transition='height 0.8s ease-in-out';
+    rope.style.height='0';
+    tip.style.transition='top 0.8s ease-in-out';
+    tip.style.top='0';
+    
+    block.style.transition='all 0.8s ease-in-out';
+    block.style.transform=`translateY(-${distanceToBlock}px)`;
+    await new Promise(r=>setTimeout(r,800));
+
+    // Move offscreen
+    hook.style.transition='left 1.2s ease-in-out';
+    block.style.transition='all 1.2s ease-in-out';
+    hook.style.left='100%';
+    block.style.transform+=` translateX(100vw)`;
+    block.style.opacity='0';
+    await new Promise(r=>setTimeout(r,1200));
+
+    // Cleanup and reset
+    block.remove();
+    hook.style.transition='none';
+    hook.style.left='0%';
+    rope.style.height='0';
+    tip.style.top='0';
+  }
+
+  async function startPickupCycle(){
+    createPileBlocks();
+    for(const hook of hooks){
+      const topBlocks=getTopBlocks();
+      if(!topBlocks.length) continue;
+      const blockIndex=Math.floor(Math.random()*topBlocks.length);
+      await pickUpBlock(hook, topBlocks[blockIndex]);
+      await new Promise(r=>setTimeout(r,600));
+    }
+    setTimeout(startPickupCycle,1000);
+  }
+
+  setTimeout(startPickupCycle,1000);
+})();
+</script>
+</body>
+</html>
