@@ -1,38 +1,7 @@
-/* MkpọŋNLP Logo Styles */
-.mkpopnlp-logo {
-  display: inline-block;
-  text-align: center;
-  font-family: 'Inter', sans-serif;
-}
-
-.mkpopnlp-logo-svg {
-  width: 100%;
-  max-width: 320px;
-  height: auto;
-  margin: 0 auto;
-  display: block;
-}
-
-.mkpopnlp-logo-title {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #2e2e2e;
-  margin-bottom: 0.25rem;
-}
-
-.mkpopnlp-logo-tagline {
-  font-size: 1rem;
-  font-weight: 500;
-  color: #555;
-  margin: 0;
-}
-
-.mkpopnlp-logo-path {
-  stroke-dasharray: 400;
-  stroke-dashoffset: 400;
-  animation: draw 1.8s ease-in-out forwards;
-}
-
-@keyframes draw {
-  to { stroke-dashoffset: 0; }
-}
+/* Mkp&#7885;&#331;NLP logo styles */
+.mkpopnlp-logo { display:inline-block; text-align:center; font-family:"Inter",sans-serif; }
+.mkpopnlp-logo-svg { display:block; width:100%; max-width:320px; height:auto; margin:0 auto; }
+.mkpopnlp-logo-title { margin-bottom:.25rem; color:#2e2e2e; font-size:1.75rem; font-weight:700; }
+.mkpopnlp-logo-tagline { margin:0; color:#555; font-size:1rem; font-weight:500; }
+.mkpopnlp-logo-path { stroke-dasharray:400; stroke-dashoffset:400; animation:draw 1.8s ease-in-out forwards; }
+@keyframes draw { to { stroke-dashoffset:0; } }
