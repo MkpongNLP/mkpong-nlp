@@ -1,0 +1,208 @@
+{
+  "$schema-comment": "Configuration for the Mkpong orthography-aware logo system. scripts/outline-glyphs.mjs and scripts/build-logo.mjs both read this file; the runtime embeds it at build time.",
+  "font": {
+    "family": "Gelasio",
+    "file": "logo/fonts/Gelasio-VariableFont_wght.ttf",
+    "unitsPerEm": 2048,
+    "instance": "variable font, default instance (wght=400 / Regular)",
+    "licenseFile": "logo/fonts/OFL.txt",
+    "license": "SIL Open Font License 1.1",
+    "source": "https://github.com/google/fonts/tree/main/ofl/gelasio",
+    "why": "Gelasio is metric-compatible with Georgia, the font the original hand-made SVG asked for, and it is OFL so it can ship with the site."
+  },
+
+  "palette": {
+    "$comment": "PROVISIONAL Akwa Ibom palette carried over from the original hand-made SVG. Centralised here and emitted as CSS variables so values can change in one place. See logo/TODO.md.",
+    "green": "#1C7C3C",
+    "orange": "#E8792A",
+    "white": "#FFFFFF",
+    "wordmark": "#1C4D2E",
+    "outline": "#1C7C3C",
+    "background": "#FFFFFF"
+  },
+
+  "themes": {
+    "color": {
+      "$comment": "Spec palette, exactly as the original artwork.",
+      "overrides": {
+        "background": "#FFFFFF"
+      }
+    },
+    "mono": {
+      "$comment": "One ink colour. The front M is knocked out to the page background (--mkpong-bg) and stroked, otherwise the three Ms merge into a blob.",
+      "overrides": {
+        "background": "#FFFFFF",
+        "green": "currentColor",
+        "orange": "currentColor",
+        "white": "var(--mkpong-bg, #FFFFFF)",
+        "wordmark": "currentColor",
+        "outline": "currentColor"
+      },
+      "literal": {
+        "$comment": "Used for static exports, which cannot use currentColor or custom properties.",
+        "green": "#1C4D2E",
+        "orange": "#1C4D2E",
+        "white": "#FFFFFF",
+        "wordmark": "#1C4D2E",
+        "outline": "#1C4D2E"
+      }
+    },
+    "dark": {
+      "$comment": "Lifted greens/oranges and a light wordmark so the mark and the white M's outline stay legible on a dark page.",
+      "overrides": {
+        "green": "#3FA45C",
+        "orange": "#F08A3C",
+        "white": "#FFFFFF",
+        "wordmark": "#E9F5EC",
+        "outline": "#7FD39A",
+        "background": "#101613"
+      }
+    }
+  },
+
+  "mark": {
+    "$comment": "Canonical geometry. Offsets are relative to the cluster centre-x and reproduce the hand-aligned original: centres 310/400/490 at font-size 300 with the centre-x at 400. The cluster never changes with orthography.",
+    "fontSize": 300,
+    "centers": {
+      "green": -90,
+      "orange": 90,
+      "white": 0
+    },
+    "paintOrder": ["green", "orange", "white"],
+    "strokeWidth": 3,
+    "$strokeWidth": "user units (px on the 300px mark); only the front/white M is stroked, with the outline colour."
+  },
+
+  "wordmark": {
+    "$comment": "text is the letter sequence; O and N are replaced by the selected variants. Offsets are laid out from advance widths + the kerning table, then the whole word is centred on its true ink bounding box (never CSS letter-spacing, which leaves a trailing offset).",
+    "text": "MKPONG",
+    "fontSize": 72,
+    "letterSpacing": 6,
+    "kerning": {},
+    "$kerning": "Pair kerning in font units (M,K,P,O,N,G and each variant key). Empty = no kerning. See logo/TODO.md: Gelasio has no legacy 'kern' table and opentype.js does not read GPOS, so real kerning still has to be supplied by hand."
+  },
+
+  "orthography": {
+    "$comment": "The ONLY letters that change. 'g' = which wordmark slot the glyph fills. 'char' is the exact codepoint in Gelasio. Anything ambiguous is needsReview:true and is listed in logo/TODO.md.",
+    "o": {
+      "o_dot": {
+        "label": "Ọ — O with dot below",
+        "short": "dot",
+        "slot": "O",
+        "char": "Ọ",
+        "codepoint": "U+1ECC",
+        "source": "font",
+        "needsReview": false,
+        "note": "Precomposed uppercase O with dot below, present in Gelasio."
+      },
+      "o_open": {
+        "label": "Ɔ — open O",
+        "short": "open",
+        "slot": "O",
+        "char": "Ɔ",
+        "codepoint": "U+0186",
+        "source": "font",
+        "needsReview": false,
+        "note": "LATIN CAPITAL LETTER OPEN O, present in Gelasio. Mirrored-C construction is available as a fallback (see composeFallback) if this ever has to be drawn instead."
+      }
+    },
+    "n": {
+      "n_hook": {
+        "label": "Ŋ — n with hook (PROVISIONAL)",
+        "short": "hook",
+        "slot": "N",
+        "char": "Ŋ",
+        "codepoint": "U+014A",
+        "source": "font",
+        "needsReview": true,
+        "note": "AMBIGUOUS. Gelasio has both U+014A LATIN CAPITAL LETTER ENG (Ŋ, right/descender hook) and U+019D LATIN CAPITAL LETTER N WITH LEFT HOOK (Ɲ). Ŋ is used by default. Confirm which hook, and which side. See logo/TODO.md."
+      },
+      "n_tilde": {
+        "label": "Ñ — n with tilde",
+        "short": "tilde",
+        "slot": "N",
+        "char": "Ñ",
+        "codepoint": "U+00D1",
+        "source": "font",
+        "needsReview": false,
+        "note": "Precomposed LATIN CAPITAL LETTER N WITH TILDE, present in Gelasio."
+      },
+      "n_bar": {
+        "label": "Ṉ — n with bar (PROVISIONAL)",
+        "short": "bar",
+        "slot": "N",
+        "char": "Ṉ",
+        "codepoint": "U+1E48",
+        "source": "font",
+        "needsReview": true,
+        "note": "AMBIGUOUS. Defaults to U+1E48 LATIN CAPITAL LETTER N WITH MACRON BELOW (Ṉ, a bar under the N) because Gelasio has no precomposed 'N with stroke'. Other readings are N + combining macron below, or a bar through the N (needs a composed glyph). Confirm. See logo/TODO.md."
+      }
+    }
+  },
+
+  "composeFallback": {
+    "$comment": "Used ONLY when a variant's codepoint is missing from the font. No variant currently needs it; the mechanism is implemented and exercised by scripts/check-logo.mjs. Adding geometry here is a design decision, not a linguistic one, so nothing is invented for Mkpong.",
+    "mirrorOpenO": {
+      "$comment": "open O drawn as a horizontally mirrored C.",
+      "base": "C",
+      "mirror": true
+    }
+  },
+
+  "layouts": {
+    "$comment": "gap is the pixel spacing between the two units (vertical for stacked, horizontal for inline).",
+    "gap": 24,
+    "padding": 8,
+    "backgrounds": {
+      "dark": "#101613",
+      "$comment": "Only used for the dark-theme static exports and the demo checkerboard."
+    }
+  },
+
+  "exports": {
+    "$comment": "Drives scripts/build-logo.mjs. Trim lists here to export less.",
+    "layouts": ["stacked", "inline", "mark", "wordmark"],
+    "orthographyLayouts": ["stacked", "inline", "wordmark"],
+    "themes": ["color", "mono", "dark"],
+    "o": ["o_dot", "o_open"],
+    "n": ["n_hook", "n_tilde", "n_bar"],
+    "pngSizes": [512, 1024],
+    "formats": ["svg", "png"],
+    "favicon": {
+      "$comment": "Mark-only and orthography-independent, so it never changes with the user's preference.",
+      "theme": "color",
+      "sizes": [16, 32, 64],
+      "square": true,
+      "padding": 4,
+      "$simplification": "The favicon is the mark only (no wordmark). The mark is ~2.2:1, so in a square icon it is letterboxed: see logo/TODO.md for the open question about a tighter small-size mark.",
+      "ico": true
+    },
+    "contactSheet": {
+      "o": ["o_dot", "o_open"],
+      "n": ["n_hook", "n_tilde", "n_bar"],
+      "theme": "color",
+      "cellWidth": 520
+    }
+  },
+
+  "runtime": {
+    "storageKey": "mkpong.orthography",
+    "eventName": "mkpong:orthography",
+    "defaults": { "o": "o_dot", "n": "n_hook" },
+    "shortAliases": {
+      "dot": "o_dot",
+      "open": "o_open",
+      "hook": "n_hook",
+      "tilde": "n_tilde",
+      "bar": "n_bar"
+    },
+    "cssVariables": {
+      "green": "--mkpong-green",
+      "orange": "--mkpong-orange",
+      "white": "--mkpong-white",
+      "wordmark": "--mkpong-wordmark",
+      "outline": "--mkpong-outline",
+      "background": "--mkpong-bg"
+    }
+  }
+}
