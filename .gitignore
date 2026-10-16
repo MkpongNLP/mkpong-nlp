@@ -1,1 +1,12 @@
 node_modules
+
+# logo/dist is a build artifact (`npm run build:logo`).
+# Only the files the site fetches at runtime are committed:
+#   mkpong-logo.js, mkpong-logo.css, orthography-head.html, favicon.*
+# The heavy generated output is not: the PNG rasters are 3.3 MB and nothing on
+# the site requests them, and the static export SVGs are for OG images / READMEs
+# that can regenerate them from the same config.
+logo/dist/svg/
+logo/dist/png/
+logo/dist/checks/
+
