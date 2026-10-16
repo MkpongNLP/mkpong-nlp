@@ -5,19 +5,34 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#e0f2f1">
   <title>Mkp&#7885;&#331;NLP &mdash; Under Construction</title>
+
+  <!-- Mkpong orthography preference, inline BEFORE any stylesheet or logo, so the
+       first paint already matches the reader's choice (no flash of the default).
+       Generated copy: logo/dist/orthography-head.html -->
+  <script>
+    (function () {
+      try {
+        var saved = JSON.parse(localStorage.getItem('mkpong.orthography') || 'null');
+        var root = document.documentElement;
+        if (saved && saved.o) root.setAttribute('data-o', saved.o);
+        if (saved && saved.n) root.setAttribute('data-n', saved.n);
+      } catch (e) {}
+    })();
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../logo/dist/mkpong-logo.css">
+  <link rel="stylesheet" href="mkpongnlp-logo.css">
   <style>
     :root { --green:#66bb6a; --green-light:#81c784; --orange:#ff7043; --ink:#293330; --muted:#5e6a66; }
     * { box-sizing:border-box; }
     body { min-height:100vh; margin:0; overflow-x:hidden; display:flex; align-items:center; justify-content:center; font-family:Inter,system-ui,sans-serif; background:linear-gradient(135deg,#fbfdfc 0%,#e0f2f1 100%); }
     .maintenance-container { width:min(100%,860px); padding:clamp(1.25rem,4vw,2.5rem); position:relative; text-align:center; }
     .logo-container { margin-bottom:1.65rem; }
-    .mkpopnlp-logo { display:inline-block; text-align:center; }
-    .mkpopnlp-logo-svg { width:100%; max-width:320px; height:auto; display:block; margin:0 auto; }
-    .mkpopnlp-logo-path { stroke-dasharray:400; stroke-dashoffset:400; animation:draw 1.8s ease-in-out forwards; }
-    @keyframes draw { to { stroke-dashoffset:0; } }
+    /* Logo styling lives in mkpongnlp-logo.css (shared with the logo system) so
+       there is only one source of truth for it. */
     .message-container { position:relative; z-index:1; padding:clamp(1.7rem,5vw,3.25rem); border:1px solid rgba(51,91,78,.09); border-radius:28px; background:rgba(255,255,255,.92); box-shadow:0 18px 50px rgba(39,83,70,.12); }
     h1 { margin:0 0 .9rem; color:var(--ink); font-size:clamp(2rem,5vw,2.85rem); font-weight:800; letter-spacing:-.055em; line-height:1.12; }
     p { max-width:620px; margin:0 auto 1rem; color:var(--muted); font-size:clamp(1rem,2vw,1.12rem); line-height:1.65; }
@@ -50,13 +65,13 @@
 <body>
   <main class="maintenance-container">
     <div class="logo-container">
-      <div class="mkpopnlp-logo" style="max-width:400px">
-        <svg class="mkpopnlp-logo-svg" viewBox="0 0 320 140" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mkp&#7885;&#331;NLP">
-          <defs><linearGradient id="gradient-navbar" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#66BB6A"/><stop offset="60%" stop-color="#81C784"/><stop offset="100%" stop-color="#FF7043"/></linearGradient></defs>
-          <path d="M 40 30 L 40 110 L 250 110" stroke="url(#gradient-navbar)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" class="mkpopnlp-logo-path"/>
-          <text x="160" y="75" font-family="Inter, sans-serif" font-size="36" font-weight="700" fill="#202725" text-anchor="middle">Mkp&#7885;&#331;NLP</text>
-        </svg>
-      </div>
+      <!-- Mkpong lockup rendered inline by logo/dist/mkpong-logo.js: outlined paths
+           (no web-font dependency), colours from the --mkpong-* custom properties,
+           and it re-renders live when the reader changes their orthography
+           preference. o/n are left unset on purpose so it follows the preference;
+           pin them (o="dot" n="hook") to override. -->
+      <mkpong-logo class="mkpopnlp-logo" layout="stacked" theme="color"
+                   title="Mkp&#7885;&#331;NLP" aria-label="Mkp&#7885;&#331;NLP"></mkpong-logo>
     </div>
     <section class="message-container" aria-labelledby="page-title">
       <h1 id="page-title">We&rsquo;re Building Something Amazing!</h1>
@@ -73,6 +88,7 @@
     </section>
     <div class="construction-area" aria-hidden="true"><div class="crane-container"><div class="crane-beam"></div><div class="hook"><div class="hook-body"></div><div class="hook-tip"></div><div class="cargo-block"></div></div><div class="block-pile"></div><div class="build-site"></div><div class="floor-beam"></div></div></div>
   </main>
+  <script src="../logo/dist/mkpong-logo.js"></script>
   <script>
     (() => {
       const icons = [0x1F528, 0x1F6A7, 0x1F6E0, 0x1F4D0, 0x26A1].map(point => String.fromCodePoint(point));
