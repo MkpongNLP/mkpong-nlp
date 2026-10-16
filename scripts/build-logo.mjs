@@ -13,7 +13,7 @@
 //   logo/dist/orthography-head.html   inline <head> snippet (no default flash)
 //   logo/dist/svg/*.svg               static, literal-colour SVG exports
 //   logo/dist/png/*.png               512 px and 1024 px
-//   logo/dist/favicon.svg|.ico        mark-only, orthography-independent
+//   logo/dist/favicon.svg|.ico        single-M, orthography-independent
 //   logo/dist/favicon-16|32|64.png
 //   logo/dist/checks/contact-sheet.png  all 6 wordmarks
 
@@ -154,7 +154,9 @@ function staticSvg(opts) {
     dimensions: true,
     useVars: false,
     padding: opts.padding,
-    square: opts.square
+    square: opts.square,
+    markStyle: opts.markStyle,
+    markPaint: opts.markPaint
   });
 }
 
@@ -248,7 +250,7 @@ for (const theme of config.exports.themes) {
 log(`static exports: ${svgCount} SVG, ${pngCount} PNG`);
 
 /* ------------------------------------------------------------------ *
- * 3. favicon (mark-only, never varies with orthography)
+ * 3. favicon: a single green M (never varies with orthography)
  * ------------------------------------------------------------------ */
 
 const favTheme = config.exports.favicon.theme;
@@ -256,7 +258,9 @@ const faviconSvg = staticSvg({
   layout: 'mark',
   theme: favTheme,
   padding: config.exports.favicon.padding,
-  square: config.exports.favicon.square === true
+  square: config.exports.favicon.square === true,
+  markStyle: config.exports.favicon.markStyle,
+  markPaint: config.exports.favicon.paint
 });
 write('favicon.svg', faviconSvg + '\n');
 
@@ -264,7 +268,7 @@ const favSizes = config.exports.favicon.sizes;
 const favPngs = favSizes.map(size => ({ size, buffer: renderPng(faviconSvg, size) }));
 favPngs.forEach(p => writeBuffer(`favicon-${p.size}.png`, p.buffer));
 if (config.exports.favicon.ico) writeBuffer('favicon.ico', icoFromPngs(favPngs));
-log(`favicon: svg + ${favPngs.map(p => p.size + 'px').join(', ')} + ico`);
+log(`favicon: ${config.exports.favicon.markStyle} ${config.exports.favicon.paint} M, svg + ${favPngs.map(p => p.size + 'px').join(', ')} + ico`);
 
 /* ------------------------------------------------------------------ *
  * 4. contact sheet: all 6 wordmarks, plus the favicon at 16/32/64
@@ -322,7 +326,7 @@ combos.forEach((combo, i) => {
 });
 
 const footerY = padding + 46 + rows * cellHeight + 20;
-sheetBody += label('Favicon (mark only, orthography-independent) — shown at native pixel size', padding, footerY - 6, 14, '#1C4D2E');
+sheetBody += label(`Favicon: a single ${config.exports.favicon.paint} M (the 3-M overlap reads as a blob at 16px) — native pixel size`, padding, footerY - 6, 14, '#1C4D2E');
 let favX = padding;
 favPngs.forEach((fav) => {
   // Native size on purpose: the point is to see what 16 px really looks like.
@@ -350,6 +354,6 @@ if (!QUIET) {
   console.log('  mkpong-logo.js, mkpong-logo.css, orthography-head.html');
   console.log('  svg/  ' + svgCount + ' files');
   console.log('  png/  ' + pngCount + ' files');
-  console.log('  favicon.svg, favicon.ico, favicon-16/32/64.png');
+  console.log('  favicon.svg, favicon.ico, favicon-16/32/64.png  (single green M)');
   console.log('  checks/contact-sheet.png');
 }

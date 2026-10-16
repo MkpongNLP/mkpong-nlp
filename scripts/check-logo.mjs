@@ -613,12 +613,28 @@ check('static SVG/PNG matrix is complete', () => {
   return { note: `${svgCount} SVGs, ${pngCount} PNGs` };
 });
 
-check('favicon is mark-only and orthography-independent', () => {
+check('favicon is a single green M: mark-only, orthography-independent, one path', () => {
   const favicon = join(DIST, 'favicon.svg');
   assert(existsSync(favicon), 'missing favicon.svg');
   const source = readFileSync(favicon, 'utf8');
   assert(!/data-unit="wordmark"/.test(source), 'favicon contains the wordmark');
   assert(/data-unit="mark"/.test(source), 'favicon has no mark');
+  assert(
+    source.includes('data-mark-style="' + config.exports.favicon.markStyle + '"'),
+    `favicon does not declare data-mark-style="${config.exports.favicon.markStyle}"`
+  );
+
+  // The whole point of the single-M icon: ONE path, not the three-M cluster.
+  const units = unitsOf(source);
+  const paths = units.mark.markup.match(/<path[\s>]/g) || [];
+  assert(
+    paths.length === 1,
+    `favicon renders ${paths.length} paths; the small-size mark is a single M`
+  );
+  const role = new RegExp(`data-role="([a-z]+)"`).exec(units.mark.markup);
+  assert(role && role[1] === config.exports.favicon.paint, `favicon M is painted "${role && role[1]}", expected "${config.exports.favicon.paint}"`);
+  assert(!/ stroke=/.test(units.mark.markup), 'the single M must not be stroked (the stroke only separates the overlapping Ms)');
+
   for (const size of config.exports.favicon.sizes) {
     const file = join(DIST, `favicon-${size}.png`);
     assert(existsSync(file), `missing favicon-${size}.png`);
@@ -638,7 +654,7 @@ check('favicon is mark-only and orthography-independent', () => {
     assert(dims.width === (ico.readUInt8(at) || 256), `favicon.ico entry ${i} is a ${dims.width}px PNG but claims ${ico.readUInt8(at)}`);
   }
   assert(sizes.join(',') === config.exports.favicon.sizes.join(','), `favicon.ico sizes are ${sizes.join(',')}`);
-  return { note: `favicon.svg + favicon.ico (${sizes.join('/')}) + pngs` };
+  return { note: `single ${config.exports.favicon.paint} M, favicon.ico (${sizes.join('/')}) + pngs` };
 });
 
 check('contact sheet and eyeball artifacts exist', () => {

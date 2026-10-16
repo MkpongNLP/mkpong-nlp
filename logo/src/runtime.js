@@ -187,15 +187,36 @@ function defaultN() { return cfg().runtime.defaults.n; }
  * units: mark and wordmark, built from the same glyph data
  * ------------------------------------------------------------------ */
 
-function buildMark(theme, useVars) {
+function buildMark(theme, useVars, style, paintRole) {
   var c = cfg().mark;
   var g = glyph('M');
   var scale = num(c.fontSize, 300) / requireData().meta.unitsPerEm;
   var strokeWidth = num(c.strokeWidth, 0);
-  var front = c.paintOrder[c.paintOrder.length - 1];
   var items = [];
   var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
 
+  // 'single' is the small-size form: one M, no overlap and no stroke. The
+  // overlapping Ms need the stroke to stay separable, but at favicon sizes they
+  // read as one dark blob anyway, so the overlap carries no meaning there.
+  if (style === 'single') {
+    var role = paintRole || 'green';
+    var txSingle = -(g.advance / 2) * scale;
+    items.push({
+      id: 'M', role: role, index: 0,
+      tx: txSingle, ty: 0, scale: scale,
+      fill: paint(role, theme, useVars),
+      stroke: null, strokeWidth: 0
+    });
+    var sbb = g.bbox;
+    return {
+      kind: 'mark',
+      style: 'single',
+      items: items,
+      bbox: [txSingle + sbb[0] * scale, sbb[1] * scale, txSingle + sbb[2] * scale, sbb[3] * scale]
+    };
+  }
+
+  var front = c.paintOrder[c.paintOrder.length - 1];
   c.paintOrder.forEach(function (role, index) {
     // The glyph is placed so its ADVANCE box is centred on the role's centre
     // offset, which is how the original artwork was aligned (text-anchor
@@ -223,7 +244,7 @@ function buildMark(theme, useVars) {
     maxY = Math.max(maxY, 0 + bb[3] * scale + pad);
   });
 
-  return { kind: 'mark', items: items, bbox: [minX, minY, maxX, maxY] };
+  return { kind: 'mark', style: 'triple', items: items, bbox: [minX, minY, maxX, maxY] };
 }
 
 function buildWordmark(fontSize, oId, nId, letterSpacing, theme, useVars) {
@@ -365,7 +386,8 @@ function renderLogo(options) {
   var padding = num(opts.padding, c.layouts.padding);
   var letterSpacing = num(opts.letterSpacing, c.wordmark.letterSpacing);
 
-  var mark = buildMark(theme, useVars);
+  var markStyle = opts.markStyle === 'single' ? 'single' : 'triple';
+  var mark = buildMark(theme, useVars, markStyle, opts.markPaint);
   var wordmark = buildWordmark(num(opts.wordmarkFontSize, c.wordmark.fontSize), oId, nId, letterSpacing, theme, useVars);
 
   var units;
@@ -423,6 +445,7 @@ function renderLogo(options) {
     ' role="img" aria-label="' + escapeXml(label) + '"' +
     ' data-o="' + oId + '" data-n="' + nId + '"' +
     ' data-layout="' + layoutName + '" data-theme="' + theme + '"' +
+    (mark.style ? ' data-mark-style="' + mark.style + '"' : '') +
     (opts.id ? ' id="' + escapeXml(opts.id) + '"' : '') +
     ' preserveAspectRatio="xMidYMid meet">' +
     '<title>' + escapeXml(title) + '</title>' +

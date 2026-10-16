@@ -186,12 +186,13 @@
     "pngSizes": [512, 1024],
     "formats": ["svg", "png"],
     "favicon": {
-      "$comment": "Mark-only and orthography-independent, so it never changes with the user's preference.",
+      "$comment": "Mark-only and orthography-independent, so it never changes with the user's preference. It is a SINGLE M in the palette green, not the three-M cluster: at 16px the overlapping Ms read as one dark blob, so the overlapping is meaningless and a lone M is legible. No stroke either - the stroke in the full mark only exists to separate the front M from the two behind it.",
       "theme": "color",
+      "markStyle": "single",
+      "paint": "green",
       "sizes": [16, 32, 64],
       "square": true,
       "padding": 4,
-      "$simplification": "The favicon is the mark only (no wordmark). The mark is ~2.2:1, so in a square icon it is letterboxed: see logo/TODO.md for the open question about a tighter small-size mark.",
       "ico": true
     },
     "contactSheet": {
