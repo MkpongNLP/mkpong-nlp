@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mkpong logo system &mdash; demo</title>
+
+  <!-- Mkpong orthography, inline in <head> BEFORE any stylesheet or logo so the
+       first paint already matches the reader's preference (no flash of the
+       default). This is the snippet shipped as logo/dist/orthography-head.html. -->
+  <script>
+    (function () {
+      try {
+        var saved = JSON.parse(localStorage.getItem('mkpong.orthography') || 'null');
+        var root = document.documentElement;
+        if (saved && saved.o) root.setAttribute('data-o', saved.o);
+        if (saved && saved.n) root.setAttribute('data-n', saved.n);
+      } catch (e) {}
+    })();
+  </script>
+
+  <link rel="stylesheet" href="dist/mkpong-logo.css">
+  <style>
+    :root { --page:#f6f8f7; --card:#ffffff; --ink:#202725; --muted:#5e6a66; --line:#dfe7e3; }
+    [data-page="dark"] { --page:#101613; --card:#161d1a; --ink:#eaf2ee; --muted:#9fb0a9; --line:#2a3531; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:24px; font-family:Inter,system-ui,sans-serif; background:var(--page); color:var(--ink); }
+    h1 { margin:0 0 4px; font-size:1.4rem; }
+    h2 { margin:28px 0 10px; font-size:1rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); }
+    p.hint { margin:0 0 20px; color:var(--muted); font-size:.9rem; max-width:70ch; }
+    .panel { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; padding:16px; background:var(--card); border:1px solid var(--line); border-radius:14px; }
+    label { display:block; font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:6px; }
+    select, input[type=range], button { width:100%; padding:7px 9px; font:inherit; font-size:.9rem; color:var(--ink); background:var(--card); border:1px solid var(--line); border-radius:8px; }
+    input[type=range] { padding:0; }
+    .stage { margin-top:16px; padding:28px; background:var(--card); border:1px solid var(--line); border-radius:14px; display:flex; justify-content:center; }
+    .stage mkpong-logo { width:min(100%,420px); }
+    .row { display:flex; gap:18px; flex-wrap:wrap; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+    .cell { padding:14px; background:var(--card); border:1px solid var(--line); border-radius:12px; }
+    .cell .cap { margin-top:8px; font-size:.72rem; color:var(--muted); font-variant-numeric:tabular-nums; }
+    pre { margin:0; padding:14px; overflow:auto; font-size:.75rem; line-height:1.5; background:var(--card); border:1px solid var(--line); border-radius:12px; }
+    .swatches { display:flex; gap:8px; flex-wrap:wrap; }
+    .swatch { width:78px; padding:8px; border:1px solid var(--line); border-radius:10px; font-size:.62rem; color:var(--muted); }
+    .swatch span { display:block; height:26px; border-radius:6px; margin-bottom:6px; }
+    .dark-bg { background:#101613; padding:20px; border-radius:12px; }
+    .mono-demo { color:#1C4D2E; }
+  </style>
+</head>
+<body>
+
+<h1>Mkpong logo system</h1>
+<p class="hint">
+  Outline-based mark + wordmark driven by glyph data. Only the O and N change with orthography.
+  Static exports live in <code>logo/dist</code>; this page exercises the runtime path.
+</p>
+
+<div class="panel">
+  <div>
+    <label for="o">O variant</label>
+    <select id="o"></select>
+  </div>
+  <div>
+    <label for="n">N variant</label>
+    <select id="n"></select>
+  </div>
+  <div>
+    <label for="layout">Layout</label>
+    <select id="layout">
+      <option value="stacked">stacked</option>
+      <option value="inline">inline</option>
+      <option value="mark">mark only</option>
+      <option value="wordmark">wordmark only</option>
+    </select>
+  </div>
+  <div>
+    <label for="theme">Logo theme</label>
+    <select id="theme">
+      <option value="color">color</option>
+      <option value="mono">mono</option>
+      <option value="dark">dark</option>
+    </select>
+  </div>
+  <div>
+    <label for="gap">Gap <output id="gapOut">24</output>px</label>
+    <input id="gap" type="range" min="0" max="120" step="1" value="24">
+  </div>
+  <div>
+    <label>Page background</label>
+    <button id="pageToggle" type="button">Switch to dark</button>
+  </div>
+</div>
+
+<div class="stage" id="stage">
+  <mkpong-logo id="preview" layout="stacked" gap="24" theme="color"></mkpong-logo>
+</div>
+
+<h2>Live preference</h2>
+<p class="hint" id="state"></p>
+
+<h2>All six wordmarks</h2>
+<div class="grid" id="combos"></div>
+
+<h2>Themes on their own backgrounds</h2>
+<div class="row">
+  <div class="cell" style="flex:1 1 260px">
+    <div class="cap">color &mdash; light page</div>
+    <div id="theme-color"></div>
+  </div>
+  <div class="cell dark-bg" style="flex:1 1 260px">
+    <div class="cap" style="color:#9fb0a9">dark &mdash; dark page (outline stays legible)</div>
+    <div id="theme-dark"></div>
+  </div>
+  <div class="cell mono-demo" style="flex:1 1 260px">
+    <div class="cap">mono &mdash; inherits <code>currentColor</code></div>
+    <div id="theme-mono"></div>
+  </div>
+</div>
+
+<h2>Palette</h2>
+<div class="swatches" id="swatches"></div>
+
+<h2>Rendered SVG (current settings)</h2>
+<pre id="source"></pre>
+
+<script src="dist/mkpong-logo.js"></script>
+<script>
+(function () {
+  var api = window.MkpongLogo;
+  var preview = document.getElementById('preview');
+  var oSelect = document.getElementById('o');
+  var nSelect = document.getElementById('n');
+  var layoutSelect = document.getElementById('layout');
+  var themeSelect = document.getElementById('theme');
+  var gapInput = document.getElementById('gap');
+  var gapOut = document.getElementById('gapOut');
+  var state = document.getElementById('state');
+  var source = document.getElementById('source');
+
+  // Start from whatever the inline head snippet already put on <html>.
+  var current = api.getOrthography();
+
+  function option(label, value) {
+    var el = document.createElement('option');
+    el.value = value;
+    el.textContent = label;
+    return el;
+  }
+
+  Object.keys(api.ORTHOGRAPHY.o).forEach(function (id) {
+    oSelect.append(option(api.ORTHOGRAPHY.o[id].label, id));
+  });
+  Object.keys(api.ORTHOGRAPHY.n).forEach(function (id) {
+    nSelect.append(option(api.ORTHOGRAPHY.n[id].label, id));
+  });
+
+  // Only now that the options exist can the selects show the stored preference.
+  oSelect.value = current.o;
+  nSelect.value = current.n;
+
+  // Orthography goes through setOrthography(): it persists to localStorage,
+  // sets data-o/data-n on <html> and broadcasts mkpong:orthography, which makes
+  // every <mkpong-logo> that is not pinned re-render.
+  oSelect.addEventListener('change', function () { api.setOrthography({ o: oSelect.value }); sync(); });
+  nSelect.addEventListener('change', function () { api.setOrthography({ n: nSelect.value }); sync(); });
+  layoutSelect.addEventListener('change', function () { preview.setAttribute('layout', layoutSelect.value); sync(); });
+  themeSelect.addEventListener('change', function () { preview.setAttribute('theme', themeSelect.value); sync(); });
+  gapInput.addEventListener('input', function () {
+    gapOut.textContent = gapInput.value;
+    preview.setAttribute('gap', gapInput.value);
+    sync();
+  });
+
+  document.getElementById('pageToggle').addEventListener('click', function (event) {
+    var dark = document.documentElement.getAttribute('data-page') === 'dark';
+    document.documentElement.setAttribute('data-page', dark ? 'light' : 'dark');
+    event.target.textContent = dark ? 'Switch to dark' : 'Switch to light';
+    sync();
+  });
+
+  function svgFor(opts) {
+    return api.renderLogo(opts);
+  }
+
+  function sync() {
+    var ortho = api.getOrthography();
+    var gap = gapInput.value;
+    var theme = themeSelect.value;
+
+    state.textContent = 'o=' + ortho.o + '  n=' + ortho.n +
+      '  layout=' + layoutSelect.value + '  gap=' + gap + '  theme=' + theme +
+      '  <html data-o="' + document.documentElement.getAttribute('data-o') +
+      '" data-n="' + document.documentElement.getAttribute('data-n') + '">' +
+      '  localStorage=' + (localStorage.getItem('mkpong.orthography') || 'empty');
+
+    // wordmark + mark grids
+    document.getElementById('combos').innerHTML = Object.keys(api.ORTHOGRAPHY.o).map(function (o) {
+      return Object.keys(api.ORTHOGRAPHY.n).map(function (n) {
+        var svg = svgFor({ o: o, n: n, layout: 'wordmark', theme: 'color' });
+        return '<div class="cell" style="display:inline-block;width:100%">' + svg +
+          '<div class="cap">' + o + ' + ' + n + '</div></div>';
+      }).join('');
+    }).join('');
+
+    ['color', 'mono', 'dark'].forEach(function (t) {
+      document.getElementById('theme-' + t).innerHTML =
+        svgFor({ o: ortho.o, n: ortho.n, layout: 'stacked', theme: t, gap: gap });
+    });
+
+    var palette = [];
+    Object.keys(api.CONFIG.runtime.cssVariables).forEach(function (role) {
+      var name = api.CONFIG.runtime.cssVariables[role];
+      var fallback = (api.CONFIG.themes[theme].overrides[role] !== undefined)
+        ? api.CONFIG.themes[theme].overrides[role]
+        : api.CONFIG.palette[role];
+      palette.push('<div class="swatch"><span style="background:' + fallback + ';border:1px solid #0002"></span>' +
+        name + '<br>' + (api.CONFIG.palette[role] || '') + '</div>');
+    });
+    document.getElementById('swatches').innerHTML = palette.join('');
+
+    source.textContent = svgFor({
+      o: ortho.o, n: ortho.n, layout: layoutSelect.value, theme: theme, gap: gap, useVars: false
+    }).replace(/></g, '>\n<');
+  }
+
+  document.addEventListener('mkpong:orthography', sync);
+  sync();
+})();
+</script>
+</body>
+</html>

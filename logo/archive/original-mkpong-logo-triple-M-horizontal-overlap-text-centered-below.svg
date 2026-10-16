@@ -1,0 +1,28 @@
+<svg viewBox="0 0 800 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .mletter {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-weight: 400;
+      }
+    </style>
+  </defs>
+
+  <rect x="0" y="0" width="800" height="520" fill="none"/>
+
+  <!-- Overlapping M cluster: stacking order back-to-front = green, orange, white -->
+  <g>
+    <!-- 1. Green M, leftmost, drawn first (back) -->
+    <text x="208" y="330" font-size="300" class="mletter" fill="#1C7C3C">M</text>
+
+    <!-- 2. Orange M, rightmost, drawn second (middle) -->
+    <text x="388" y="330" font-size="300" class="mletter" fill="#E8792A">M</text>
+
+    <!-- 3. White M with green outline, middle position, drawn last (front) -->
+    <text x="298" y="330" font-size="300" class="mletter" fill="#FFFFFF" stroke="#1C7C3C" stroke-width="3">M</text>
+  </g>
+
+  <!-- Wordmark, centered on same axis as the M cluster -->
+  <text x="400" y="470" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="72" letter-spacing="6" fill="#1C4D2E">MKPONG</text>
+</svg>

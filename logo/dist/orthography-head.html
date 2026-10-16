@@ -1,0 +1,14 @@
+<!-- Mkpong orthography, inline in <head>, BEFORE any stylesheet or logo.
+     Sets data-o / data-n on <html> from localStorage so the first paint
+     already shows the reader's preferred orthography (no flash of the default).
+     Keep it inline: a deferred script would paint the default first. -->
+<script>
+(function () {
+  try {
+    var saved = JSON.parse(localStorage.getItem('mkpong.orthography') || 'null');
+    var root = document.documentElement;
+    if (saved && saved.o) root.setAttribute('data-o', saved.o);
+    if (saved && saved.n) root.setAttribute('data-n', saved.n);
+  } catch (e) {}
+})();
+</script>
