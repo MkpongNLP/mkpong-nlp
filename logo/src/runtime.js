@@ -392,8 +392,12 @@ function renderLogo(options) {
     geo.height = side;
   }
 
-  var title = opts.title || opts.ariaLabel || 'MKPONG';
-  var label = opts.ariaLabel || opts.title || 'MKPONG';
+  // The accessible name is the brand's plain-ASCII name, not the wordmark text
+  // with variant glyphs, so it does not change with the reader's preference.
+  var brandConfig = cfg().wordmark || {};
+  var brand = brandConfig.label || brandConfig.text || 'MKPON';
+  var title = opts.title || opts.ariaLabel || brand;
+  var label = opts.ariaLabel || opts.title || brand;
   var dims = opts.dimensions === true
     ? ' width="' + fmt(geo.width) + '" height="' + fmt(geo.height) + '"'
     : '';

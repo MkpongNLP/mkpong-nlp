@@ -258,7 +258,7 @@ function actualLetters(svg) {
     .map(m => ({ slot: m[1], variant: m[2] || null, d: m[3], box: pathBBox(m[3]) }));
 }
 
-check('wordmark letters are M K P O N G in order, with the chosen variants in the O and N slots', () => {
+check(`wordmark letters are ${config.wordmark.text.split('').join(' ')} in order, with the chosen variants in the O and N slots`, () => {
   let count = 0;
   for (const oId of config.exports.o) {
     for (const nId of config.exports.n) {
@@ -339,14 +339,13 @@ check('all six combinations render differently, and every variant is distinct', 
 
 check('variant glyphs differ in the way their names promise', () => {
   const boxes = id => glyphs.glyphs[id].bbox;
-  // dot below sits under the baseline, tilde above the cap, bar below the baseline
+  // dot below sits under the baseline, tilde above the cap, bar above the cap
   assert(boxes('o_dot')[3] > 0, 'o_dot should have ink below the baseline (dot below)');
   assert(boxes('n_tilde')[1] < boxes('N')[1], 'n_tilde should have ink above the cap height (tilde)');
-  assert(boxes('n_bar')[3] > 0, 'n_bar should have ink below the baseline (bar)');
+  assert(boxes('n_bar')[1] < boxes('N')[1], 'n_bar should have ink above the cap height (bar above)');
+  assert(boxes('n_bar')[3] <= boxes('N')[3] + 0.01, 'n_bar should not descend: the bar is above, not below');
   assert(boxes('n_hook')[3] > boxes('N')[3], 'n_hook should descend further than a plain N');
   assert(boxes('o_open')[2] < boxes('O')[2], 'open O should be narrower than O');
-  const review = Object.entries(config.orthography.n).filter(([, v]) => v.needsReview).map(([k]) => k);
-  assert(review.length > 0, 'expected n_hook (and n_bar) to be flagged needsReview');
   Object.entries(config.orthography).forEach(([group, table]) => {
     if (group.startsWith('$')) return;
     Object.entries(table).forEach(([id, def]) => {
@@ -356,9 +355,39 @@ check('variant glyphs differ in the way their names promise', () => {
         entry.needsReview === (def.needsReview === true),
         `${id}: config says needsReview=${def.needsReview === true} but glyphs.json says ${entry.needsReview}`
       );
+      // A construction named in the config must actually have been used.
+      if (def.compose) {
+        assert(entry.composed, `${id}: config names construction "${def.compose}" but it was not composed`);
+        assert(entry.construction === def.compose, `${id}: composed with "${entry.construction}", expected "${def.compose}"`);
+      }
     });
   });
-  return { note: `flagged for confirmation: ${review.join(', ')}` };
+  const review = glyphs.report.filter(r => r.needsReview).map(r => r.id);
+  return { note: review.length ? `still flagged for confirmation: ${review.join(', ')}` : 'no variant is awaiting confirmation' };
+});
+
+check('n_bar is composed from the font: base N + the font\'s own macron, in the font\'s own band', () => {
+  const entry = glyphs.glyphs.n_bar;
+  assert(entry.source === 'composed', `n_bar.source is ${entry.source}, expected composed`);
+  assert(entry.construction === 'barAboveN', `n_bar used construction ${entry.construction}`);
+  assert(entry.composedFrom === 'N + U+0304', `n_bar is built from "${entry.composedFrom}"`);
+  assert(entry.advance === glyphs.glyphs.N.advance, 'n_bar must keep the N advance width (the bar hangs above)');
+
+  const [d] = entry.derivedGeometry || [];
+  assert(d, 'n_bar recorded no derivation');
+  // The bar is the font's macron outline, unmodified in size - only moved.
+  assert(d.bandTop === -1748, `the uppercase macron band should be -1748, got ${d.bandTop}`);
+  assert(d.bandSpread === 0, `the band glyphs disagree by ${d.bandSpread}; the construction is no longer well-defined`);
+  assert(d.bandFrom.length >= 3, `only ${d.bandFrom.length} band glyphs; too few to call it the font's band`);
+  assert(Math.abs(d.placed[1] - d.bandTop) < 0.01, `the bar top landed at ${d.placed[1]}, not on the band ${d.bandTop}`);
+  const placedW = d.placed[2] - d.placed[0];
+  const outlineW = d.outline[2] - d.outline[0];
+  assert(Math.abs(placedW - outlineW) < 0.01, 'the bar was resized instead of moved');
+  // centred over the N ink, and clear of the cap
+  const nInk = glyphs.glyphs.N.bbox;
+  closeTo((d.placed[0] + d.placed[2]) / 2, (nInk[0] + nInk[2]) / 2, 0.5, 'bar centre vs N ink centre');
+  assert(d.placed[3] < nInk[1], `the bar (bottom ${d.placed[3]}) must clear the N cap (top ${nInk[1]})`);
+  return { note: `bar y ${d.placed[1]}..${d.placed[3]}, cap top ${nInk[1]}: ${(nInk[1] - d.placed[3]).toFixed(0)} units of clearance` };
 });
 
 /* ------------------------------------------------------------------ *

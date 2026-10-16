@@ -18,8 +18,12 @@
 // variant in logo.config.json never requires re-running the font tooling.
 //
 // If a variant's codepoint is missing from the font, it is composed from a base
-// glyph plus drawn marks (see logo.config.json -> composeFallback) and marked
-// needsReview: true so it cannot ship silently.
+// glyph plus marks (see logo.config.json -> composeFallback). A variant can also
+// name a construction explicitly with `compose`, which is how n_bar works: its
+// char is "N" + U+0304, and the font would resolve the leading N alone, so the
+// composition is requested rather than inferred. Composed glyphs report the
+// geometry they were derived from, and anything still awaiting a decision is
+// marked needsReview: true so it cannot ship silently.
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -61,6 +65,16 @@ function dOf(path) {
   return path.toPathData(DECIMALS);
 }
 
+/**
+ * opentype.js 1.3.x's Path constructor takes no arguments, so
+ * `new Path(commands)` silently yields an empty path. Assign the commands.
+ */
+function pathFromCommands(commands) {
+  const path = new opentype.Path();
+  path.commands = commands;
+  return path;
+}
+
 /** Scale every coordinate of an absolute path string. */
 function scalePathData(path, sx, sy = sx) {
   const out = [];
@@ -87,6 +101,31 @@ function mirrorPathData(path, advance) {
   });
   // Command order stays valid: only x coordinates changed.
   return mirrored;
+}
+
+function translatePathData(path, dx, dy) {
+  return path.commands.map(cmd => {
+    const c = { ...cmd };
+    for (const k of ['x', 'x1', 'x2']) if (c[k] != null) c[k] = round(c[k] + dx);
+    for (const k of ['y', 'y1', 'y2']) if (c[k] != null) c[k] = round(c[k] + dy);
+    return c;
+  });
+}
+
+function codepointToChar(cp) {
+  return String.fromCodePoint(parseInt(String(cp).replace(/^U\+/i, ''), 16));
+}
+
+/** The most frequent value, so one odd glyph does not move a whole band. */
+function mostCommon(values) {
+  const counts = new Map();
+  for (const v of values) counts.set(v, (counts.get(v) || 0) + 1);
+  let best = values[0];
+  let bestCount = 0;
+  for (const [v, n] of counts) {
+    if (n > bestCount) { best = v; bestCount = n; }
+  }
+  return best;
 }
 
 /* ------------------------------------------------------------------ *
@@ -143,18 +182,103 @@ function markCommands(mark) {
   }
 }
 
+/**
+ * A mark taken from another glyph in the font, so the shape and weight are the
+ * designer's, not a drawn approximation. Placement can be derived rather than
+ * hardcoded:
+ *   placement.x            "centreOverBaseInk" centres it over the base's ink
+ *   placement.bandTopFrom  [codepoints] puts the mark's top edge on the band
+ *                          those glyphs use for the same mark (a macron sits at
+ *                          one height in every precomposed uppercase macron, so
+ *                          that height is the font's own answer for the band)
+ */
+function glyphMarkCommands(mark, baseBox) {
+  const src = glyphPath(codepointToChar(mark.char));
+  if (!src) throw new Error(`compose: mark glyph ${mark.char} is missing from ${CONFIG.font.family}`);
+  const srcBox = bboxOf(src.path);
+  const place = mark.placement || {};
+  let dx = Number.isFinite(place.dx) ? place.dx : 0;
+  let dy = Number.isFinite(place.dy) ? place.dy : 0;
+  const derivation = { mark: mark.char, glyph: src.glyph.name, outline: srcBox };
+
+  if (place.x === 'centreOverBaseInk') {
+    dx = (baseBox[0] + baseBox[2]) / 2 - (srcBox[0] + srcBox[2]) / 2;
+    derivation.x = 'centred over the base ink';
+  }
+
+  if (place.bandTopFrom) {
+    const band = place.bandTopFrom.map(cp => {
+      const g = glyphPath(codepointToChar(cp));
+      if (!g) throw new Error(`compose: band glyph ${cp} is missing from ${CONFIG.font.family}`);
+      return { cp, top: bboxOf(g.path)[1] };
+    });
+    const targetTop = round(mostCommon(band.map(b => b.top)));
+    dy = targetTop - srcBox[1];
+    const tops = [...new Set(band.map(b => b.top))];
+    derivation.bandTop = targetTop;
+    derivation.bandFrom = band;
+    derivation.bandSpread = tops.length === 1 ? 0 : round(Math.max(...tops) - Math.min(...tops));
+  }
+
+  derivation.dx = round(dx);
+  derivation.dy = round(dy);
+  derivation.placed = [
+    round(srcBox[0] + dx), round(srcBox[1] + dy),
+    round(srcBox[2] + dx), round(srcBox[3] + dy),
+  ];
+
+  return { commands: translatePathData(src.path, dx, dy), derivation, stroked: false };
+}
+
 function compose(baseEntry, spec) {
   if (!baseEntry) throw new Error(`compose: missing base glyph for ${JSON.stringify(spec)}`);
+  const baseBox = bboxOf(baseEntry.path);
   let commands = spec.mirror
     ? mirrorPathData(baseEntry.path, baseEntry.advance)
     : baseEntry.path.commands.map(c => ({ ...c }));
 
+  const strokes = [];
+  const derivations = [];
   for (const mark of spec.marks || []) {
-    commands = commands.concat(markCommands({ advance: baseEntry.advance, ...mark }));
+    if (mark.kind === 'glyph') {
+      const built = glyphMarkCommands(mark, baseBox);
+      commands = commands.concat(built.commands);
+      derivations.push(built.derivation);
+    } else {
+      commands = commands.concat(markCommands({ advance: baseEntry.advance, ...mark }));
+      if (mark.kind === 'tilde' || mark.kind === 'hook') strokes.push(mark);
+    }
   }
 
-  const strokes = (spec.marks || []).filter(m => m.kind === 'tilde' || m.kind === 'hook');
-  return { commands, advance: baseEntry.advance, stroked: strokes.length > 0, marks: spec.marks || [] };
+  return {
+    commands,
+    advance: baseEntry.advance,
+    stroked: strokes.length > 0,
+    marks: spec.marks || [],
+    derivations,
+  };
+}
+
+function describeComposition(spec) {
+  const parts = [spec.mirror ? `mirror(${spec.base})` : spec.base];
+  for (const mark of spec.marks || []) {
+    parts.push(mark.kind === 'glyph' ? mark.char : `${mark.kind} (drawn)`);
+  }
+  return parts.join(' + ');
+}
+
+/** The base of a construction: a plain letter, or another variant's glyph. */
+function baseGlyph(baseKey) {
+  let char = baseKey;
+  if (!glyphs[baseKey]) {
+    const m = /^(o|n)_(.+)$/.exec(baseKey);
+    const def = m && CONFIG.orthography[m[1]] && CONFIG.orthography[m[1]][baseKey];
+    if (!def) throw new Error(`compose: unknown base "${baseKey}"`);
+    char = def.char;
+  }
+  const found = glyphPath(char);
+  if (!found) throw new Error(`compose: base glyph "${char}" is missing from ${CONFIG.font.family}`);
+  return { char, path: found.path, advance: found.glyph.advanceWidth };
 }
 
 /* ------------------------------------------------------------------ *
@@ -202,7 +326,7 @@ for (const [group, variants] of Object.entries(CONFIG.orthography)) {
   if (group.startsWith('$')) continue;
   for (const [id, def] of Object.entries(variants)) {
     if (id.startsWith('$')) continue;
-    let entry = makeEntry(id, def.char, {
+    const direct = makeEntry(id, def.char, {
       slot: def.slot,
       label: def.label,
       short: def.short,
@@ -211,34 +335,42 @@ for (const [group, variants] of Object.entries(CONFIG.orthography)) {
       note: def.note,
     });
 
+    // Composition is requested explicitly with `compose`, or inferred when the
+    // codepoint has no glyph at all in the font.
+    const specKey = def.compose ? def.compose : (direct.missing ? def.id : null);
+
+    let entry = direct;
     let composed = false;
-    if (entry.missing) {
-      const spec = CONFIG.composeFallback[def.compose];
+    if (specKey) {
+      const spec = CONFIG.composeFallback[specKey];
       if (!spec) {
         throw new Error(
-          `Gelasio has no glyph for ${id} (${def.char} ${codepointOf(def.char)}) and ` +
-          `logo.config.json has no composeFallback for it. Add a construction and mark it needsReview.`
+          `${id}: logo.config.json has no composeFallback named "${specKey}". ` +
+          (direct.missing
+            ? `Gelasio has no glyph for ${def.char} (${codepointOf(def.char)}).`
+            : `The glyph itself exists, so this construction was asked for explicitly.`)
         );
       }
-      const base = spec.base.startsWith('o_') || spec.base.startsWith('n_')
-        ? glyphs[spec.base] || glyphs[CONFIG.orthography[spec.base.split('_')[0]][spec.base].char]
-        : glyphs[spec.base];
+      const base = baseGlyph(spec.base);
       const built = compose(base, spec);
-      const path = new opentype.Path(built.commands);
+      const path = pathFromCommands(built.commands);
       entry = {
         id,
         char: def.char,
         codepoint: codepointOf(def.char),
         source: 'composed',
-        composedFrom: `${spec.mirror ? 'mirror(' : ''}${spec.base}${spec.mirror ? ')' : ''}`,
+        construction: specKey,
+        composedFrom: describeComposition(spec),
+        derivedGeometry: built.derivations,
         advance: round(built.advance),
         bbox: bboxOf(path),
         d: dOf(path),
         stroke: built.stroked,
+        strokeWidth: null,
         slot: def.slot,
         label: def.label,
         short: def.short,
-        needsReview: true,
+        needsReview: def.needsReview === true,
         note: def.note,
       };
       composed = true;
@@ -253,6 +385,9 @@ for (const [group, variants] of Object.entries(CONFIG.orthography)) {
       codepoint: codepointOf(def.char),
       inFont: !entry.missing && !composed,
       composed,
+      construction: specKey,
+      composedFrom: entry.composedFrom || null,
+      derivedGeometry: entry.derivedGeometry || null,
       needsReview: entry.needsReview === true,
       advance: entry.advance,
     });
@@ -289,7 +424,23 @@ for (const r of report) {
   );
 }
 console.log(`\n${report.filter(r => r.inFont).length}/${report.length} variants resolved directly from the font.`);
-const review = report.filter(r => r.needsReview);
-if (review.length) {
-  console.log(`Needs your confirmation (see logo/TODO.md): ${review.map(r => `${r.id} (${r.char} ${r.codepoint})`).join(', ')}`);
+
+const composed = report.filter(r => r.composed);
+if (composed.length) {
+  console.log('\nComposed glyphs (geometry measured from the font, not invented):');
+  for (const r of composed) {
+    console.log(`  ${r.id}: ${r.composedFrom}   [${r.construction}]`);
+    for (const d of r.derivedGeometry || []) {
+      const band = d.bandTop == null
+        ? ''
+        : `  band top ${d.bandTop} from ${d.bandFrom.length} glyphs` +
+          (d.bandSpread ? ` (SPREAD ${d.bandSpread} - check)` : ' (all agree)');
+      console.log(`    ${d.glyph} ${d.mark} ${JSON.stringify(d.outline)} -> placed ${JSON.stringify(d.placed)}  dx=${d.dx} dy=${d.dy}${band}`);
+    }
+  }
 }
+
+const review = report.filter(r => r.needsReview);
+console.log(review.length
+  ? `\nNeeds your confirmation (see logo/TODO.md): ${review.map(r => `${r.id} (${r.char} ${r.codepoint})`).join(', ')}`
+  : '\nNo variant is awaiting confirmation.');

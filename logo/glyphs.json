@@ -87,24 +87,75 @@
     },
     "n_bar": {
       "id": "n_bar",
-      "char": "Ṉ",
-      "codepoint": "U+1E48",
-      "source": "font",
-      "glyphName": "Nmacronbelow",
+      "char": "N̄",
+      "codepoint": "U+004E U+0304",
+      "source": "composed",
+      "construction": "barAboveN",
+      "composedFrom": "N + U+0304",
+      "derivedGeometry": [
+        {
+          "mark": "U+0304",
+          "glyph": "uni0304",
+          "outline": [
+            -294,
+            -1297,
+            294,
+            -1156
+          ],
+          "x": "centred over the base ink",
+          "bandTop": -1748,
+          "bandFrom": [
+            {
+              "cp": "U+0100",
+              "top": -1748
+            },
+            {
+              "cp": "U+0112",
+              "top": -1748
+            },
+            {
+              "cp": "U+012A",
+              "top": -1748
+            },
+            {
+              "cp": "U+014C",
+              "top": -1748
+            },
+            {
+              "cp": "U+016A",
+              "top": -1748
+            },
+            {
+              "cp": "U+1E20",
+              "top": -1748
+            }
+          ],
+          "bandSpread": 0,
+          "dx": 787,
+          "dy": -451,
+          "placed": [
+            493,
+            -1748,
+            1081,
+            -1607
+          ]
+        }
+      ],
       "advance": 1571,
       "bbox": [
         53,
-        -1419,
+        -1748,
         1521,
-        328
+        30
       ],
-      "d": "M521 0L96 0Q79 0 70.50-20Q62-40 62-51L62-51Q62-84 95-88L95-88Q127-91 163-98Q199-105 224.50-122.50Q250-140 250-172L250-172L250-1234Q250-1277 222.50-1296Q195-1315 157.50-1321.50Q120-1328 89-1331L89-1331Q68-1333 60.50-1339.50Q53-1346 53-1368L53-1368Q53-1379 61.50-1399Q70-1419 87-1419L87-1419L425-1419L1202-313L1214-313L1214-1234Q1214-1277 1181.50-1296Q1149-1315 1107-1321.50Q1065-1328 1034-1331L1034-1331Q1013-1333 1005.50-1339.50Q998-1346 998-1368L998-1368Q998-1379 1006.50-1399Q1015-1419 1032-1419L1032-1419L1487-1419Q1504-1419 1512.50-1399Q1521-1379 1521-1368L1521-1368Q1521-1335 1488-1331L1488-1331Q1458-1328 1416.50-1321.50Q1375-1315 1344-1296Q1313-1277 1313-1234L1313-1234L1313-113Q1313-94 1315-81.50Q1317-69 1319-40L1319-40Q1322 2 1301 16Q1280 30 1259 30L1259 30Q1223 30 1205 8L1205 8L366-1154L349-1154L349-185Q349-142 379-123Q409-104 449-98Q489-92 519-88L519-88Q540-86 547.50-80Q555-74 555-51L555-51Q555-40 546.50-20Q538 0 521 0L521 0ZM1054 328L467 328L467 180L1054 180L1054 328Z",
+      "d": "M521 0L96 0Q79 0 70.50-20Q62-40 62-51L62-51Q62-84 95-88L95-88Q127-91 163-98Q199-105 224.50-122.50Q250-140 250-172L250-172L250-1234Q250-1277 222.50-1296Q195-1315 157.50-1321.50Q120-1328 89-1331L89-1331Q68-1333 60.50-1339.50Q53-1346 53-1368L53-1368Q53-1379 61.50-1399Q70-1419 87-1419L87-1419L425-1419L1202-313L1214-313L1214-1234Q1214-1277 1181.50-1296Q1149-1315 1107-1321.50Q1065-1328 1034-1331L1034-1331Q1013-1333 1005.50-1339.50Q998-1346 998-1368L998-1368Q998-1379 1006.50-1399Q1015-1419 1032-1419L1032-1419L1487-1419Q1504-1419 1512.50-1399Q1521-1379 1521-1368L1521-1368Q1521-1335 1488-1331L1488-1331Q1458-1328 1416.50-1321.50Q1375-1315 1344-1296Q1313-1277 1313-1234L1313-1234L1313-113Q1313-94 1315-81.50Q1317-69 1319-40L1319-40Q1322 2 1301 16Q1280 30 1259 30L1259 30Q1223 30 1205 8L1205 8L366-1154L349-1154L349-185Q349-142 379-123Q409-104 449-98Q489-92 519-88L519-88Q540-86 547.50-80Q555-74 555-51L555-51Q555-40 546.50-20Q538 0 521 0L521 0ZM1081-1607L493-1607L493-1748L1081-1748L1081-1607Z",
+      "stroke": false,
+      "strokeWidth": null,
       "slot": "N",
-      "label": "Ṉ — n with bar (PROVISIONAL)",
+      "label": "N̄ — n with a bar above",
       "short": "bar",
-      "configuredSource": "font",
-      "needsReview": true,
-      "note": "AMBIGUOUS. Defaults to U+1E48 LATIN CAPITAL LETTER N WITH MACRON BELOW (Ṉ, a bar under the N) because Gelasio has no precomposed 'N with stroke'. Other readings are N + combining macron below, or a bar through the N (needs a composed glyph). Confirm. See logo/TODO.md."
+      "needsReview": false,
+      "note": "CONFIRMED: the bar sits ABOVE the letter. Gelasio has no precomposed glyph for that (U+1E48 is a macron BELOW), so this variant is composed: the base N plus the font's own combining macron (U+0304), centred over the N's ink and placed at the top of the font's uppercase macron band. See composeFallback.barAboveN for how that band and the x placement are derived from the font rather than invented."
     },
     "n_hook": {
       "id": "n_hook",
@@ -121,11 +172,11 @@
       ],
       "d": "M864 449L864 449Q791 449 738 428.50Q685 408 657 376Q629 344 629 310L629 310Q629 271 650.50 246.50Q672 222 700 210.50Q728 199 746 199L746 199Q755 199 760.50 206Q766 213 774 226L774 226L860 347Q924 347 973.50 335Q1023 323 1057.50 288Q1092 253 1109.50 184Q1127 115 1127 0L1127 0L1127-1001Q1127-1106 1101.50-1169.50Q1076-1233 1035.50-1265.50Q995-1298 947.50-1309.50Q900-1321 856-1321L856-1321Q767-1321 690-1293.50Q613-1266 557-1224Q501-1182 473-1136L473-1136L473-175Q473-111 510.50-96.50Q548-82 585-78L585-78Q606-76 613.50-70Q621-64 621-41L621-41Q621-30 612.50-15Q604 0 587 0L587 0L154 0Q137 0 128.50-15Q120-30 120-41L120-41Q120-74 153-78L153-78Q190-83 229.50-96Q269-109 269-142L269-142L269-1203Q269-1265 242-1288Q215-1311 180-1316Q145-1321 120-1328L120-1328Q110-1333 103-1341Q96-1349 96-1368L96-1368Q96-1380 102-1396Q108-1412 120-1413L120-1413Q217-1419 304.50-1420.50Q392-1422 433-1422L433-1422Q441-1422 451-1414Q461-1406 463-1382L463-1382L463-1220Q476-1252 517-1289.50Q558-1327 619.50-1361Q681-1395 755-1417Q829-1439 908-1439L908-1439Q964-1439 1036-1425.50Q1108-1412 1175.50-1369Q1243-1326 1287-1238Q1331-1150 1331-1000L1331-1000L1331-41Q1331 96 1277.50 207.50Q1224 319 1120 384Q1016 449 864 449Z",
       "slot": "N",
-      "label": "Ŋ — n with hook (PROVISIONAL)",
+      "label": "Ŋ — n with hook (right hook, descending)",
       "short": "hook",
       "configuredSource": "font",
-      "needsReview": true,
-      "note": "AMBIGUOUS. Gelasio has both U+014A LATIN CAPITAL LETTER ENG (Ŋ, right/descender hook) and U+019D LATIN CAPITAL LETTER N WITH LEFT HOOK (Ɲ). Ŋ is used by default. Confirm which hook, and which side. See logo/TODO.md."
+      "needsReview": false,
+      "note": "CONFIRMED: a right hook that descends below the baseline. U+014A LATIN CAPITAL LETTER ENG, present in Gelasio. Deliberately NOT U+019D LATIN CAPITAL LETTER N WITH LEFT HOOK (Ɲ)."
     },
     "n_tilde": {
       "id": "n_tilde",
@@ -230,6 +281,9 @@
       "codepoint": "U+1ECC",
       "inFont": true,
       "composed": false,
+      "construction": null,
+      "composedFrom": null,
+      "derivedGeometry": null,
       "needsReview": false,
       "advance": 1524
     },
@@ -241,18 +295,24 @@
       "codepoint": "U+0186",
       "inFont": true,
       "composed": false,
+      "construction": null,
+      "composedFrom": null,
+      "derivedGeometry": null,
       "needsReview": false,
       "advance": 1315
     },
     {
       "id": "n_hook",
-      "label": "Ŋ — n with hook (PROVISIONAL)",
+      "label": "Ŋ — n with hook (right hook, descending)",
       "slot": "N",
       "char": "Ŋ",
       "codepoint": "U+014A",
       "inFont": true,
       "composed": false,
-      "needsReview": true,
+      "construction": null,
+      "composedFrom": null,
+      "derivedGeometry": null,
+      "needsReview": false,
       "advance": 1511
     },
     {
@@ -263,18 +323,72 @@
       "codepoint": "U+00D1",
       "inFont": true,
       "composed": false,
+      "construction": null,
+      "composedFrom": null,
+      "derivedGeometry": null,
       "needsReview": false,
       "advance": 1571
     },
     {
       "id": "n_bar",
-      "label": "Ṉ — n with bar (PROVISIONAL)",
+      "label": "N̄ — n with a bar above",
       "slot": "N",
-      "char": "Ṉ",
-      "codepoint": "U+1E48",
-      "inFont": true,
-      "composed": false,
-      "needsReview": true,
+      "char": "N̄",
+      "codepoint": "U+004E U+0304",
+      "inFont": false,
+      "composed": true,
+      "construction": "barAboveN",
+      "composedFrom": "N + U+0304",
+      "derivedGeometry": [
+        {
+          "mark": "U+0304",
+          "glyph": "uni0304",
+          "outline": [
+            -294,
+            -1297,
+            294,
+            -1156
+          ],
+          "x": "centred over the base ink",
+          "bandTop": -1748,
+          "bandFrom": [
+            {
+              "cp": "U+0100",
+              "top": -1748
+            },
+            {
+              "cp": "U+0112",
+              "top": -1748
+            },
+            {
+              "cp": "U+012A",
+              "top": -1748
+            },
+            {
+              "cp": "U+014C",
+              "top": -1748
+            },
+            {
+              "cp": "U+016A",
+              "top": -1748
+            },
+            {
+              "cp": "U+1E20",
+              "top": -1748
+            }
+          ],
+          "bandSpread": 0,
+          "dx": 787,
+          "dy": -451,
+          "placed": [
+            493,
+            -1748,
+            1081,
+            -1607
+          ]
+        }
+      ],
+      "needsReview": false,
       "advance": 1571
     }
   ]
