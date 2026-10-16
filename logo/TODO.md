@@ -1,131 +1,162 @@
-# Mkpong logo — open questions
+# Mkpong logo — open questions and decisions
 
-Everything here is something I deliberately did **not** invent. Each item has a
-clear question and the current placeholder behaviour. Nothing in this list is
-silently wrong: the placeholders are marked in the code and in
-`logo/ORTHOGRAPHY.md`, and the two ambiguous variants are flagged
-`needsReview: true` in `logo/logo.config.json`, which `npm run check:logo`
-asserts.
+This file is the log of the things I deliberately did **not** invent, plus what
+came back when they were reviewed. Each open item has a clear question and the
+current placeholder behaviour; each decided item records what was chosen and
+where it now lives. Nothing here is silently wrong: every placeholder is marked
+in the code and in `logo/ORTHOGRAPHY.md`.
+
+**Open: 4** (§5, §7, §8, §9 — all deferred rather than blocking).
+**Decided: 6** (§1, §2, §3, §4, §6, §10).
+
+`npm run check:logo` enforces the structure that keeps these honest: a variant's
+`needsReview` flag must match `logo/glyphs.json`, a variant that names a
+construction must really be composed through it, and the wordmark sequence must
+match the config. So a new undecided variant cannot slip in unflagged.
 
 ---
 
-## 1. `n_hook` — which hook? (blocks correctness)
+## Open
 
-Currently resolves to **U+014A Ŋ (ENG)**: hook on the right, descends below the
-baseline (ink to y = +449 at upm 2048).
+### 5. Kerning (deferred — not needed yet)
 
-The alternative in the same font is **U+019D Ɲ (N WITH LEFT HOOK)**: hook on the
-left, same advance as a plain N (1571), no descender.
+`logo.config.json` → `wordmark.kerning` is **empty**, so letters sit on raw
+advance widths plus the 6px letter-spacing carried over from the original SVG.
 
-**Question:** which is the Mkpong/Ibibio "n with hook", and does it descend?
+Gelasio ships kerning in a GPOS table only and has no legacy `kern` table, and
+opentype.js does not read GPOS. So the choices are: extract GPOS pair kerning at
+outline time, or hand-tune a table.
 
-Changing it is a one-line edit in `logo/logo.config.json` (`orthography.n.n_hook.char`)
-followed by `npm run build:logo`. All exports, the favicon-independent wordmark,
-the demo and the checks follow automatically.
+**Question (when it matters):** which way? The pairs that would actually matter
+are `M-K`, `K-P`, `P-O`, `O-N` (and the variant spellings of the last two). I
+would not guess values.
 
-## 2. `n_bar` — bar under, or stroke through? (blocks correctness)
+### 7. Accessible name (queued)
 
-Currently resolves to **U+1E48 Ṉ (N WITH MACRON BELOW)**: a short bar *under* the
-N (ink to y = +328).
+`<mkpong-logo>` exposes the config's `wordmark.label` as the accessible name
+(`"MKPON"`), overridable per element; the maintenance page passes `MkpọNLP`. It
+does **not** change with the orthography preference.
 
-**Question:** is it a bar *under* the letter, or a stroke *through* it? If it is
-through the letter there is no precomposed Unicode character, so it has to be
-composed (`logo.config.json` -> `composeFallback`) and I need to know the bar
-height, thickness and whether it extends past the stems.
+**Question:** should the accessible name follow the preference — i.e. be spelled
+"Mkpọŋ / Mkpọñ / Mkpọṉ" for screen readers — and if so, which slots are
+pronounced?
 
-## 3. `o_dot` / `o_open` — confirm the pair
+Resolved along the way: the wordmark no longer ends in a `G` (see §2/§3 notes
+below and `logo/ORTHOGRAPHY.md`), so the logo now reads **Mkpọŋ**, the brand,
+rather than the site name's full "MkpọŋNLP". The two still differ by the `NLP`
+suffix, which is intentional: the logo is the brand mark, the title is the site.
 
-Currently `o_dot` = U+1ECC (Ọ, dot below, advance 1524) and `o_open` = U+0186
-(Ɔ, OPEN O, advance 1315).
-
-**Question:** confirm these two are the intended members of the O pair. If
-"open o" is supposed to be a mirrored `C` instead of the real Ɔ glyph, say so —
-that construction is already described in `composeFallback.mirrorOpenO`.
-
-## 4. Final hex values (blocks sign-off, not the build)
-
-`logo/logo.config.json` -> `palette` is marked *PROVISIONAL*. It carries over the
-original artwork's values:
-
-| role       | value     | used for                        |
-|------------|-----------|---------------------------------|
-| `green`    | `#1C7C3C` | back M                          |
-| `orange`   | `#E8792A` | middle M                        |
-| `white`    | `#FFFFFF` | front M fill                    |
-| `outline`  | `#1C7C3C` | front M stroke                  |
-| `wordmark` | `#1C4D2E` | MKPONG letters                  |
-| `background` | `#FFFFFF` | mono knockout (`--mkpong-bg`) |
-
-The `dark` theme (`#3FA45C`, `#F08A3C`, `#E9F5EC`, outline `#7FD39A`,
-background `#101613`) is **my invention** to keep the front M's outline legible
-on dark pages.
-
-**Questions:** are the Akwa Ibom green/orange values final, and if not, what are
-they? Do you want a dark theme at all, and with which values?
-
-Note the original page also used `#66BB6A` / `#81C784` / `#FF7043` for the old
-gradient lockup. If those are the brand colours, say which set wins.
-
-## 5. Kerning (affects polish)
-
-`logo.config.json` -> `wordmark.kerning` is **empty**, so letters sit on raw
-advance widths (plus the 6px letter-spacing carried over from the original SVG).
-
-Gelasio ships kerning in a GPOS table only, and it has no legacy `kern` table;
-opentype.js does not read GPOS. So there are two ways forward:
-
-**Question:** should the build extract GPOS pair kerning from the font at
-outline time, or do you want a hand-tuned table? The pairs that actually matter
-here are `M-K`, `K-P`, `P-O`, `O-N`, `N-G` (and the variant spellings of the
-last three). I would not guess values.
-
-## 6. Favicon at small sizes (design question)
-
-`favicon.svg` / `favicon.ico` / `favicon-16|32|64.png` are the **mark only** (no
-wordmark), which is what "simplified" means here.
-
-The mark is ~2.2:1, so inside a square icon it is letterboxed and at 16 px it is
-mushy.
-
-**Question:** do you want a tighter small-size mark — e.g. reduced M overlap to
-make it squarer, or a single-M monogram — or should the full triple-M mark be
-kept as is?
-
-## 7. Accessible name
-
-`<mkpong-logo>` currently exposes `aria-label="MKPONG"` (overridable per element;
-the maintenance page passes `MkpọNLP`).
-
-**Question:** should the accessible name follow the orthography preference — i.e.
-be spelled "Mkpọŋ / Mkpọñ / Mkpọṉ" for screen readers — and if so, which slots
-are pronounced? Right now it never changes with the preference.
-
-Also: the site name is spelled **MkpọŋNLP** in the page title while the logo
-wordmark is **MKPONG**. Confirm that the two are meant to differ.
-
-## 8. Letter-spacing value
+### 8. Letter-spacing value (deferred)
 
 `wordmark.letterSpacing` is `6` (from the original SVG's `letter-spacing="6"` at
 font-size 72), applied *between* letters only. With real outlines and no kerning
-this is the only thing setting optical rhythm.
+this is currently the only thing setting optical rhythm.
 
-**Question:** keep 6, drop it to 0 and rely on kerning (item 5), or a different
-value?
+**Question (when it matters):** keep `6`, drop it to `0` and rely on kerning
+(§5), or use a different value?
 
-## 9. Mono theme and `--mkpong-bg`
+### 9. Mono theme and `--mkpong-bg` (kept)
 
-In the `mono` theme the front M is knocked out to `var(--mkpong-bg, #FFFFFF)`.
-On a dark page the site must set `--mkpong-bg` (or use the `dark` theme), or the
-knockout will read as a white shape on a dark mark.
+In the `mono` theme the front M is knocked out to `var(--mkpong-bg, #FFFFFF)`. On
+a dark page the site must set `--mkpong-bg` (or use the `dark` theme), otherwise
+the knockout reads as a white shape on a dark mark.
 
-**Question:** is a mono variant wanted at all, and should it use the page
-background automatically via `currentColor`-style inheritance instead?
+Review note: "doesn't hurt" — kept as is. The theme and the escape hatch stay.
 
-## 10. Build artifacts in version control
+---
 
-`logo/dist/` is generated but **committed**, because the site is served statically
-and the maintenance page loads `logo/dist/mkpong-logo.js` directly. `node_modules/`
-is ignored.
+## Decided
 
-**Question:** happy with generated `logo/dist/` in the repo (58 SVGs + ~118 PNGs),
-or should the build run in a deploy step and `dist/` be ignored instead?
+### 1. `n_hook` — right hook, descending ✅
+
+Answer: *"Right Hook descending"*.
+
+Resolves to **U+014A LATIN CAPITAL LETTER ENG (Ŋ)**: hook on the right,
+descending below the baseline (ink to y = +449 at upm 2048). This was already the
+default, so the change was to stop flagging it: `needsReview` is now `false`, the
+label reads "n with hook (right hook, descending)", and the note records that
+U+019D Ɲ (left hook) was considered and rejected.
+
+### 2. `n_bar` — a bar ABOVE the letter ✅
+
+Answer: *"The bar is ABOVE"*.
+
+The old default was **wrong**: `U+1E48` is N WITH MACRON **BELOW**. Gelasio has
+no precomposed N-with-macron-above (no Unicode character does, in fact), so the
+variant is now composed: `orthography.n.n_bar.source` is `composed` and it names
+the construction `composeFallback.barAboveN`.
+
+The construction is measured from the font, not invented:
+
+| part of the bar | where it comes from |
+|---|---|
+| shape / weight | Gelasio's own combining macron, U+0304 (588 × 141 units) |
+| vertical band | the top edge every precomposed uppercase macron in Gelasio shares — Ā, Ē, Ī, Ō, Ū and Ḡ all put the macron at y = **−1748** |
+| horizontal place | centred over the N's ink |
+
+Result: the bar sits at y −1748…−1607, x 493…1081 — 188 units clear of the N's
+cap top, and 588 units wide over a 1468-unit letter. It is only ever *translated*
+(never scaled), and `npm run check:logo` asserts that plus the band, the advance
+width and the clearance.
+
+`logo/glyphs.json` records the derivation it used (`derivedGeometry`), so if the
+font is ever swapped the geometry follows, and if the bar should look different
+(wider, thicker, higher, or a different mark entirely) this is the one place to
+change: `composeFallback.barAboveN` in `logo.config.json`.
+
+### 3. `o_dot` / `o_open` — confirmed ✅
+
+Answer: *"3/4 are fine"*.
+
+`o_dot` = **U+1ECC Ọ** (dot below, advance 1524) and `o_open` = **U+0186 Ɔ**
+(OPEN O, advance 1315) stay as they were. The mirrored-`C` alternative in
+`composeFallback.mirrorOpenO` remains available but unused.
+
+### 4. Palette and dark theme — confirmed ✅
+
+Answer: *"3/4 are fine"* — the provisional palette stands (values in
+`logo/ORTHOGRAPHY.md` and `logo.config.json` → `palette`), including the
+`dark` theme I invented to keep the front M's outline legible on dark pages. The
+old gradient colours (`#66BB6A` / `#81C784` / `#FF7043`) are not used.
+
+### 6. Favicon at small sizes — a single green M ✅
+
+Answer: *"a single green M is going to be the move, because it is meaningless at
+16px"*.
+
+The favicon is no longer the three-M cluster: `exports.favicon.markStyle` is
+`"single"`, painted in the `green` role, unstroked. At 16px the overlapping Ms
+merge into one dark blob and the separating stroke becomes a pale fringe, so the
+overlap carried no meaning there. The square is tighter too (−41% width), so the
+`M` fills the tab icon. The full lockup keeps the triple-M mark everywhere else.
+
+### 10. Build artifacts in version control — split the difference ✅
+
+Answer: *"it'd be best for this to need a build run step and not clog up the
+github repo"* — with the important caveat, raised and checked, that the site
+fetches two generated files at runtime and the repo has no deploy config, so a
+fully ignored `dist/` would 404 the logo in production unless a build step were
+wired up.
+
+So `logo/dist/` is split: the files the deployed page actually needs are
+committed — `mkpong-logo.js` (45 KB), `mkpong-logo.css`, `orthography-head.html`
+and the favicons, ~58 KB — while the heavy generated output that nothing on the
+site requests is ignored: `svg/` (738 KB), `png/` (3.35 MB) and `checks/`
+(64 KB). That removes 98.6% of the generated bytes without making the site depend
+on a build step.
+
+`npm run build:logo` regenerates everything; `npm run check:logo` builds first,
+then runs the checks.
+
+---
+
+## Standing notes
+
+- Only the `O` and the `N` of the `MKPON` wordmark vary. The `M` cluster is
+  orthography-independent, and so is the favicon.
+- Changing any variant is a one-line edit in `logo/logo.config.json` followed by
+  `npm run build:logo` (or just `npm run outline` if only glyph data changed).
+  Exports, the demo, the favicon and the checks all follow.
+- Adding a variant that has no precomposed glyph means adding a construction to
+  `composeFallback` and leaving `needsReview: true` until it is confirmed; the
+  build refuses to ship a missing glyph that has no construction.
