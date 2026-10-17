@@ -44,21 +44,7 @@
     .social-link { display:inline-flex; align-items:center; min-height:2.5rem; padding:.5rem .9rem; border:1px solid rgba(51,91,78,.08); border-radius:999px; color:#52605b; background:#f6f8f7; font-size:.88rem; font-weight:600; text-decoration:none; transition:transform .2s ease,background .2s ease,color .2s ease,box-shadow .2s ease; }
     .social-link:not(.disabled):hover { transform:translateY(-2px); color:#fff; background:var(--green); box-shadow:0 7px 16px rgba(102,187,106,.25); }
     .social-link.disabled { opacity:.65; cursor:default; }
-    .construction-area { position:relative; width:100%; height:190px; margin-top:1.25rem; }
-    .crane-container { position:absolute; inset:0; height:165px; pointer-events:none; }
-    .crane-beam { position:absolute; top:0; left:5%; width:90%; height:9px; border-radius:6px; background:linear-gradient(90deg,#596460,#404946); box-shadow:0 3px 5px rgba(30,48,42,.22); }
-    .crane-beam::before { position:absolute; left:1.5%; bottom:9px; width:8px; height:116px; border-radius:5px 5px 0 0; background:#596460; box-shadow:calc(100% - 8px) 0 #596460; content:""; }
-    .floor-beam { position:absolute; bottom:0; left:5%; width:90%; height:7px; border-radius:5px; background:#596460; box-shadow:0 3px 5px rgba(30,48,42,.2); }
-    .hook { position:absolute; top:9px; left:24%; width:32px; height:40px; z-index:3; transform:translateX(-50%); }
-    .hook-body { position:absolute; top:0; left:50%; width:4px; height:0; margin-left:-2px; border-radius:2px; background:var(--orange); }
-    .hook-tip { position:absolute; top:0; left:50%; width:13px; height:13px; margin-left:-6px; border-bottom:4px solid var(--orange); border-left:4px solid var(--orange); border-radius:0 0 0 8px; }
-    .cargo-block { position:absolute; top:0; left:50%; display:none; width:32px; height:16px; margin-left:-16px; border-radius:4px; background:linear-gradient(to bottom,#ff8a65,#f4511e); box-shadow:0 2px 4px rgba(80,42,27,.22); }
-    .block-pile,.build-site { position:absolute; bottom:7px; height:105px; z-index:1; }
-    .block-pile { left:11%; width:30%; }
-    .build-site { right:11%; width:30%; border-bottom:3px solid rgba(89,100,96,.45); }
-    .build-site::before { position:absolute; right:0; bottom:0; color:#78908a; content:"Building it up"; font-size:.7rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; transform:translateY(1.5rem); }
-    .pile-block { position:absolute; width:32px; height:16px; border-radius:4px; background:linear-gradient(to bottom,#ff8a65,#f4511e); box-shadow:0 2px 4px rgba(80,42,27,.22); transition:opacity .35s ease,transform .8s ease; }
-    @media (max-width:540px) { .message-container { border-radius:22px; } .construction-area { height:160px; } .crane-container { height:138px; } .crane-beam::before { height:88px; } .block-pile,.build-site { height:82px; } .social-links { gap:.45rem; } .social-link { font-size:.8rem; padding:.45rem .7rem; } }
+    @media (max-width:540px) { .message-container { border-radius:22px; } .social-links { gap:.45rem; } .social-link { font-size:.8rem; padding:.45rem .7rem; } }
     @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
   </style>
 </head>
@@ -86,7 +72,6 @@
         <a href="mailto:ndianaobot8@gmail.com" class="social-link">Email Us</a>
       </div>
     </section>
-    <div class="construction-area" aria-hidden="true"><div class="crane-container"><div class="crane-beam"></div><div class="hook"><div class="hook-body"></div><div class="hook-tip"></div><div class="cargo-block"></div></div><div class="block-pile"></div><div class="build-site"></div><div class="floor-beam"></div></div></div>
   </main>
   <script src="../logo/dist/mkpong-logo.js"></script>
   <script>
@@ -94,19 +79,6 @@
       const icons = [0x1F528, 0x1F6A7, 0x1F6E0, 0x1F4D0, 0x26A1].map(point => String.fromCodePoint(point));
       const icon = document.querySelector('.switching-icon'); let current = 0;
       setInterval(() => { current = (current + 1) % icons.length; icon.style.animation = 'none'; void icon.offsetWidth; icon.textContent = icons[current]; icon.style.animation = ''; }, 1300);
-    })();
-    (() => {
-      const crane = document.querySelector('.crane-container'); const hook = document.querySelector('.hook'); const pile = document.querySelector('.block-pile'); const buildSite = document.querySelector('.build-site'); const rope = hook.querySelector('.hook-body'); const tip = hook.querySelector('.hook-tip'); const cargo = hook.querySelector('.cargo-block');
-      const sleep = ms => new Promise(resolve => setTimeout(resolve, ms)); let placed = 0;
-      const setHook = (x, duration = 900) => { hook.style.transition = `left ${duration}ms cubic-bezier(.4,0,.2,1)`; hook.style.left = `${x}px`; };
-      const ropeTo = (distance, duration = 620) => { rope.style.transition = `height ${duration}ms ease-in-out`; tip.style.transition = `top ${duration}ms ease-in-out`; cargo.style.transition = `top ${duration}ms ease-in-out`; rope.style.height = `${distance}px`; tip.style.top = `${distance}px`; cargo.style.top = `${distance + 12}px`; };
-      function makePile() { pile.replaceChildren(); buildSite.replaceChildren(); placed = 0; const columns = Math.max(4, Math.min(7, Math.floor(pile.clientWidth / 32))); const start = (pile.clientWidth - columns * 32) / 2; for (let column = 0; column < columns; column++) for (let row = 0; row < (column % 3 === 1 ? 3 : 2); row++) { const block = document.createElement('div'); block.className = 'pile-block'; block.style.left = `${start + column * 32}px`; block.style.bottom = `${row * 16}px`; pile.append(block); } }
-      function nextBlock() { const tops = new Map(); pile.querySelectorAll('.pile-block').forEach(block => { const left = block.style.left; if (!tops.has(left) || parseInt(block.style.bottom,10) > parseInt(tops.get(left).style.bottom,10)) tops.set(left, block); }); return [...tops.values()][0]; }
-      const siteColumns = () => Math.max(3, Math.floor(buildSite.clientWidth / 32));
-      function placeBlock() { const columns = siteColumns(); const block = document.createElement('div'); block.className = 'pile-block'; block.style.left = `${(buildSite.clientWidth - columns * 32) / 2 + (placed % columns) * 32}px`; block.style.bottom = `${Math.floor(placed / columns) * 16}px`; buildSite.append(block); placed++; }
-      async function moveBlock(block) { const craneRect = crane.getBoundingClientRect(); const blockRect = block.getBoundingClientRect(); const pickX = blockRect.left + blockRect.width / 2 - craneRect.left; setHook(pickX); await sleep(920); const pickDistance = blockRect.top - hook.getBoundingClientRect().top; ropeTo(pickDistance); await sleep(660); block.style.opacity = '0'; cargo.style.display = 'block'; cargo.style.top = `${pickDistance + 12}px`; ropeTo(0); await sleep(660); const siteRect = buildSite.getBoundingClientRect(); const targetX = siteRect.left + siteRect.width / 2 - craneRect.left; setHook(targetX, 1100); await sleep(1120); const row = Math.floor(placed / siteColumns()); const cargoTop = siteRect.bottom - 19 - row * 16; const dropDistance = cargoTop - hook.getBoundingClientRect().top - 12; ropeTo(dropDistance); await sleep(660); cargo.style.display = 'none'; block.remove(); placeBlock(); ropeTo(0); await sleep(660); }
-      async function cycle() { makePile(); while (nextBlock()) { await moveBlock(nextBlock()); await sleep(260); } await sleep(900); cycle(); }
-      setTimeout(cycle, 500);
     })();
   </script>
 </body>
